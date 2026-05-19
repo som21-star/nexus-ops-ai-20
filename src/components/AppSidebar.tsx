@@ -5,7 +5,14 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const nav = [
+type NavItem = {
+  to: string;
+  label: string;
+  icon: typeof LayoutDashboard;
+  exact?: boolean;
+  accent?: boolean;
+};
+const nav: NavItem[] = [
   { to: "/app", label: "Overview", icon: LayoutDashboard, exact: true },
   { to: "/app/forecasting", label: "Forecasting", icon: TrendingUp },
   { to: "/app/optimization", label: "Optimization", icon: Wrench },
@@ -16,7 +23,7 @@ const nav = [
   { to: "/app/reports", label: "Reports", icon: FileBarChart2 },
   { to: "/app/integrations", label: "Integrations", icon: Plug },
   { to: "/app/settings", label: "Settings", icon: Settings },
-] as const;
+];
 
 export function AppSidebar() {
   const { pathname } = useLocation();
