@@ -5,7 +5,7 @@ import { ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianG
 import { FlaskConical, Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/app/simulator")({
-  component: Simulator;
+  component: Simulator,
 });
 
 function Slider({ label, value, min, max, step, suffix, onChange }: { label: string; value: number; min: number; max: number; step: number; suffix: string; onChange: (v: number) => void; }) {
