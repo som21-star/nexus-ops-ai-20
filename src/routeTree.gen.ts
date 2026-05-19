@@ -9,38 +9,180 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as AppRouteImport } from './routes/app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppIndexRouteImport } from './routes/app.index'
+import { Route as AppSimulatorRouteImport } from './routes/app.simulator'
+import { Route as AppSettingsRouteImport } from './routes/app.settings'
+import { Route as AppReportsRouteImport } from './routes/app.reports'
+import { Route as AppOptimizationRouteImport } from './routes/app.optimization'
+import { Route as AppIntegrationsRouteImport } from './routes/app.integrations'
+import { Route as AppForecastingRouteImport } from './routes/app.forecasting'
+import { Route as AppCopilotRouteImport } from './routes/app.copilot'
+import { Route as AppCohortsRouteImport } from './routes/app.cohorts'
+import { Route as AppAnomalyRouteImport } from './routes/app.anomaly'
 
+const AppRoute = AppRouteImport.update({
+  id: '/app',
+  path: '/app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppIndexRoute = AppIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSimulatorRoute = AppSimulatorRouteImport.update({
+  id: '/simulator',
+  path: '/simulator',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppSettingsRoute = AppSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppReportsRoute = AppReportsRouteImport.update({
+  id: '/reports',
+  path: '/reports',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppOptimizationRoute = AppOptimizationRouteImport.update({
+  id: '/optimization',
+  path: '/optimization',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppIntegrationsRoute = AppIntegrationsRouteImport.update({
+  id: '/integrations',
+  path: '/integrations',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppForecastingRoute = AppForecastingRouteImport.update({
+  id: '/forecasting',
+  path: '/forecasting',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCopilotRoute = AppCopilotRouteImport.update({
+  id: '/copilot',
+  path: '/copilot',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCohortsRoute = AppCohortsRouteImport.update({
+  id: '/cohorts',
+  path: '/cohorts',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppAnomalyRoute = AppAnomalyRouteImport.update({
+  id: '/anomaly',
+  path: '/anomaly',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/anomaly': typeof AppAnomalyRoute
+  '/app/cohorts': typeof AppCohortsRoute
+  '/app/copilot': typeof AppCopilotRoute
+  '/app/forecasting': typeof AppForecastingRoute
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/optimization': typeof AppOptimizationRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/simulator': typeof AppSimulatorRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/app/anomaly': typeof AppAnomalyRoute
+  '/app/cohorts': typeof AppCohortsRoute
+  '/app/copilot': typeof AppCopilotRoute
+  '/app/forecasting': typeof AppForecastingRoute
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/optimization': typeof AppOptimizationRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/simulator': typeof AppSimulatorRoute
+  '/app': typeof AppIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/app': typeof AppRouteWithChildren
+  '/app/anomaly': typeof AppAnomalyRoute
+  '/app/cohorts': typeof AppCohortsRoute
+  '/app/copilot': typeof AppCopilotRoute
+  '/app/forecasting': typeof AppForecastingRoute
+  '/app/integrations': typeof AppIntegrationsRoute
+  '/app/optimization': typeof AppOptimizationRoute
+  '/app/reports': typeof AppReportsRoute
+  '/app/settings': typeof AppSettingsRoute
+  '/app/simulator': typeof AppSimulatorRoute
+  '/app/': typeof AppIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/app'
+    | '/app/anomaly'
+    | '/app/cohorts'
+    | '/app/copilot'
+    | '/app/forecasting'
+    | '/app/integrations'
+    | '/app/optimization'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/simulator'
+    | '/app/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/app/anomaly'
+    | '/app/cohorts'
+    | '/app/copilot'
+    | '/app/forecasting'
+    | '/app/integrations'
+    | '/app/optimization'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/simulator'
+    | '/app'
+  id:
+    | '__root__'
+    | '/'
+    | '/app'
+    | '/app/anomaly'
+    | '/app/cohorts'
+    | '/app/copilot'
+    | '/app/forecasting'
+    | '/app/integrations'
+    | '/app/optimization'
+    | '/app/reports'
+    | '/app/settings'
+    | '/app/simulator'
+    | '/app/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/app': {
+      id: '/app'
+      path: '/app'
+      fullPath: '/app'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +190,110 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/app/': {
+      id: '/app/'
+      path: '/'
+      fullPath: '/app/'
+      preLoaderRoute: typeof AppIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/simulator': {
+      id: '/app/simulator'
+      path: '/simulator'
+      fullPath: '/app/simulator'
+      preLoaderRoute: typeof AppSimulatorRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/settings': {
+      id: '/app/settings'
+      path: '/settings'
+      fullPath: '/app/settings'
+      preLoaderRoute: typeof AppSettingsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/reports': {
+      id: '/app/reports'
+      path: '/reports'
+      fullPath: '/app/reports'
+      preLoaderRoute: typeof AppReportsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/optimization': {
+      id: '/app/optimization'
+      path: '/optimization'
+      fullPath: '/app/optimization'
+      preLoaderRoute: typeof AppOptimizationRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/integrations': {
+      id: '/app/integrations'
+      path: '/integrations'
+      fullPath: '/app/integrations'
+      preLoaderRoute: typeof AppIntegrationsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/forecasting': {
+      id: '/app/forecasting'
+      path: '/forecasting'
+      fullPath: '/app/forecasting'
+      preLoaderRoute: typeof AppForecastingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/copilot': {
+      id: '/app/copilot'
+      path: '/copilot'
+      fullPath: '/app/copilot'
+      preLoaderRoute: typeof AppCopilotRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/cohorts': {
+      id: '/app/cohorts'
+      path: '/cohorts'
+      fullPath: '/app/cohorts'
+      preLoaderRoute: typeof AppCohortsRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/app/anomaly': {
+      id: '/app/anomaly'
+      path: '/anomaly'
+      fullPath: '/app/anomaly'
+      preLoaderRoute: typeof AppAnomalyRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppAnomalyRoute: typeof AppAnomalyRoute
+  AppCohortsRoute: typeof AppCohortsRoute
+  AppCopilotRoute: typeof AppCopilotRoute
+  AppForecastingRoute: typeof AppForecastingRoute
+  AppIntegrationsRoute: typeof AppIntegrationsRoute
+  AppOptimizationRoute: typeof AppOptimizationRoute
+  AppReportsRoute: typeof AppReportsRoute
+  AppSettingsRoute: typeof AppSettingsRoute
+  AppSimulatorRoute: typeof AppSimulatorRoute
+  AppIndexRoute: typeof AppIndexRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppAnomalyRoute: AppAnomalyRoute,
+  AppCohortsRoute: AppCohortsRoute,
+  AppCopilotRoute: AppCopilotRoute,
+  AppForecastingRoute: AppForecastingRoute,
+  AppIntegrationsRoute: AppIntegrationsRoute,
+  AppOptimizationRoute: AppOptimizationRoute,
+  AppReportsRoute: AppReportsRoute,
+  AppSettingsRoute: AppSettingsRoute,
+  AppSimulatorRoute: AppSimulatorRoute,
+  AppIndexRoute: AppIndexRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
