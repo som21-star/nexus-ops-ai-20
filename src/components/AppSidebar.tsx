@@ -55,7 +55,7 @@ export function AppSidebar() {
           return (
             <Link
               key={item.to}
-              to={item.to}
+              to={item.to as string}
               className={cn(
                 "group flex items-center gap-3 rounded-md px-3 py-2 text-sm transition relative",
                 active
