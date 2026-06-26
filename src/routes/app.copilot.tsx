@@ -1,152 +1,222 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useState } from "react";
-import { Sparkles, Send, BarChart3 } from "lucide-react";
-import { ResponsiveContainer, BarChart, Bar, XAxis, CartesianGrid, Tooltip, YAxis } from "recharts";
+import { useState, useRef, useEffect } from "react";
 import { cn } from "@/lib/utils";
+import { Sparkles, Send, RotateCcw, ChevronRight } from "lucide-react";
+import {
+  ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid,
+} from "recharts";
 
 export const Route = createFileRoute("/app/copilot")({
-  component: Copilot,
+  component: CopilotPage,
 });
 
-type Msg = { role: "user" | "ai"; text: string; chart?: { k: string; v: number }[]; rec?: string; confidence?: number };
+const GOLD = "#B8924A";
 
-const seed: Msg[] = [
-  { role: "user", text: "Which SKUs are most likely to stock out next week?" },
+type Message = {
+  role: "user" | "assistant";
+  content: string;
+  chart?: { data: { k: string; v: number }[]; label: string };
+  actions?: string[];
+};
+
+const suggestions = [
+  "Why did revenue drop 8% in South India last week?",
+  "Which SKUs are at highest stockout risk this month?",
+  "What happens if I run a 15% promo in North cluster?",
+  "Show me the top 3 optimization opportunities right now",
+  "Which cohort has the highest churn risk?",
+];
+
+const initialMessages: Message[] = [
   {
-    role: "ai",
-    text: "Four SKUs sit above the 80% stockout-probability threshold for the next 7 days. NX-AERO-01 (North) and NX-VANTA-31 (North) carry the highest revenue exposure.",
-    chart: [
-      { k: "AERO-01", v: 92 }, { k: "VANTA-31", v: 89 }, { k: "ORBIT-14", v: 84 }, { k: "FLUX-22", v: 81 },
-    ],
-    rec: "Trigger optimisation: rebalance 1,200u from WH-Pune and pre-book air freight on VANTA-31.",
-    confidence: 0.93,
+    role: "assistant",
+    content: "Hello. I'm the Nexora AI Copilot — your agentic operations analyst. I have full context of your demand forecasts, anomaly signals, inventory positions, and cohort data.\n\nAsk me anything about your operations, or try one of the suggestions below.",
   },
 ];
 
-const suggestions = [
-  "Why did revenue drop in South India last week?",
-  "Predict festive season demand for Personal Care.",
-  "What inventory should we reduce in WH-Mumbai?",
-  "Simulate a 5% price cut on Beverages.",
-];
-
-function Copilot() {
-  const [msgs, setMsgs] = useState<Msg[]>(seed);
-  const [input, setInput] = useState("");
-
-  function send(text: string) {
-    if (!text.trim()) return;
-    const userMsg: Msg = { role: "user", text };
-    const aiMsg: Msg = {
-      role: "ai",
-      text: "Working on it — Nexora is correlating sales, stock and supplier data to draft an answer.",
-      chart: [
-        { k: "Driver A", v: Math.round(Math.random() * 60 + 20) },
-        { k: "Driver B", v: Math.round(Math.random() * 60 + 10) },
-        { k: "Driver C", v: Math.round(Math.random() * 60 + 5) },
+const mockResponses: Record<string, Message> = {
+  default: {
+    role: "assistant",
+    content: "I've analysed your question across all active data streams. Based on current signals:\n\n• Demand in South cluster is trending +14% above seasonal baseline\n• 3 SKUs show critical stockout risk within 7 days\n• The optimization engine has identified $48k in actionable savings\n\nWould you like me to drill into any of these areas?",
+    actions: ["View anomalies", "Open optimizer", "Run simulation"],
+  },
+  revenue: {
+    role: "assistant",
+    content: "Three drivers explain the 8.1% revenue decline in South India last week:",
+    chart: {
+      data: [
+        { k: "Stock break", v: 4.2 },
+        { k: "Competitor promo", v: 2.6 },
+        { k: "Returns surge", v: 1.3 },
       ],
-      rec: "Route the result to Optimization for an executable plan.",
-      confidence: 0.84 + Math.random() * 0.1,
-    };
-    setMsgs((m) => [...m, userMsg, aiMsg]);
+      label: "Revenue impact (%)",
+    },
+    actions: ["Investigate stock break", "Simulate competitor response", "View returns data"],
+  },
+  stockout: {
+    role: "assistant",
+    content: "The 3 SKUs with highest stockout probability in the next 30 days are:\n\n1. **NX-AERO-01** (North) — 97% stockout probability, 1,200u deficit\n2. **NX-VANTA-31** (North) — 94% stockout probability, 380u deficit\n3. **NX-ORBIT-14** (East) — 91% stockout probability, 370u deficit\n\nThe optimization engine has pre-built reorder recommendations for all three.",
+    actions: ["View reorder plans", "Approve all reorders", "Simulate air freight"],
+  },
+};
+
+function getResponse(input: string): Message {
+  const lower = input.toLowerCase();
+  if (lower.includes("revenue") || lower.includes("drop") || lower.includes("decline")) return mockResponses.revenue;
+  if (lower.includes("stockout") || lower.includes("risk") || lower.includes("sku")) return mockResponses.stockout;
+  return mockResponses.default;
+}
+
+function CopilotPage() {
+  const [messages, setMessages] = useState<Message[]>(initialMessages);
+  const [input, setInput] = useState("");
+  const [loading, setLoading] = useState(false);
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages, loading]);
+
+  const send = (text?: string) => {
+    const q = (text ?? input).trim();
+    if (!q) return;
     setInput("");
-  }
+    setMessages((prev) => [...prev, { role: "user", content: q }]);
+    setLoading(true);
+    setTimeout(() => {
+      setMessages((prev) => [...prev, getResponse(q)]);
+      setLoading(false);
+    }, 900);
+  };
+
+  const reset = () => { setMessages(initialMessages); setInput(""); };
 
   return (
-    <div className="space-y-6">
-      <header>
-        <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">AI Copilot</div>
-        <h1 className="mt-1 text-3xl font-semibold tracking-tight flex items-center gap-3">
-          <Sparkles className="h-7 w-7 text-gold" /> Ask Nexora
-        </h1>
-        <p className="mt-1 text-sm text-muted-foreground">Agentic analyst grounded in your operational data.</p>
-      </header>
+    <div className="flex flex-col h-[calc(100vh-3.5rem-4rem)] max-w-4xl mx-auto">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-4 shrink-0">
+        <div>
+          <div className="text-[10px] uppercase tracking-[0.22em] text-[#B8924A] mb-1">Workspace · Copilot</div>
+          <h1 className="text-2xl font-semibold text-[#F2F0EB] tracking-[-0.01em] flex items-center gap-2">
+            <Sparkles className="h-5 w-5 text-[#B8924A]" />
+            AI Copilot
+          </h1>
+        </div>
+        <button
+          onClick={reset}
+          className="inline-flex items-center gap-2 rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-2 text-xs text-[#B0B0B0] hover:border-white/[0.15] hover:text-[#F2F0EB] transition-all"
+        >
+          <RotateCcw className="h-3.5 w-3.5" /> New chat
+        </button>
+      </div>
 
-      <div className="grid lg:grid-cols-4 gap-4">
-        <aside className="space-y-4">
-          <div className="rounded-2xl border border-border bg-surface/40 p-4">
-            <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Suggested questions</div>
-            <ul className="mt-3 space-y-2">
-              {suggestions.map((s) => (
-                <li key={s}>
-                  <button onClick={() => send(s)} className="w-full text-left rounded-md border border-border/60 bg-background/40 px-3 py-2 text-xs hover:border-gold/40 transition">
-                    {s}
-                  </button>
-                </li>
-              ))}
-            </ul>
-          </div>
-          <div className="rounded-2xl border border-border bg-surface/40 p-4">
-            <div className="text-xs uppercase tracking-[0.22em] text-muted-foreground">Context</div>
-            <ul className="mt-3 space-y-1.5 text-xs text-muted-foreground">
-              <li>· Sales · 18 months</li>
-              <li>· Inventory · 12 warehouses</li>
-              <li>· Returns · last 90d</li>
-              <li>· Supplier lead-times</li>
-              <li>· Promotions calendar</li>
-            </ul>
-          </div>
-        </aside>
-
-        <section className="lg:col-span-3 rounded-2xl border border-border bg-surface/40 flex flex-col min-h-[640px]">
-          <div className="flex-1 p-5 space-y-5 overflow-y-auto">
-            {msgs.map((m, i) => (
-              <div key={i} className={cn("flex", m.role === "user" ? "justify-end" : "justify-start")}>
-                <div className={cn(
-                  "max-w-2xl rounded-2xl px-4 py-3 text-sm",
-                  m.role === "user"
-                    ? "bg-foreground text-background"
-                    : "border border-gold/30 bg-surface-elevated text-foreground"
-                )}>
-                  {m.role === "ai" && (
-                    <div className="flex items-center gap-2 text-[10px] uppercase tracking-[0.22em] text-gold mb-2">
-                      <Sparkles className="h-3 w-3" /> Nexora
-                    </div>
-                  )}
-                  <div className="leading-relaxed">{m.text}</div>
-                  {m.chart && (
-                    <div className="mt-4 h-40 rounded-lg bg-background/40 border border-border/60 p-2">
-                      <ResponsiveContainer>
-                        <BarChart data={m.chart}>
-                          <CartesianGrid stroke="oklch(1 0 0 / 0.05)" vertical={false} />
-                          <XAxis dataKey="k" stroke="oklch(0.68 0.01 260)" fontSize={10} axisLine={false} tickLine={false} />
-                          <YAxis hide />
-                          <Tooltip contentStyle={{ background: "oklch(0.22 0.006 260)", border: "1px solid oklch(0.30 0.006 260)", borderRadius: 8, fontSize: 11 }} />
-                          <Bar dataKey="v" fill="oklch(0.82 0.13 85)" radius={[4,4,0,0]} />
-                        </BarChart>
-                      </ResponsiveContainer>
-                    </div>
-                  )}
-                  {m.rec && (
-                    <div className="mt-3 rounded-lg border border-border/60 bg-background/30 p-3 flex items-center gap-3">
-                      <BarChart3 className="h-4 w-4 text-electric shrink-0" />
-                      <div className="text-xs text-muted-foreground flex-1">{m.rec}</div>
-                      <button className="text-xs rounded-md bg-foreground text-background px-2.5 py-1 font-medium hover:opacity-90">Run</button>
-                    </div>
-                  )}
-                  {m.confidence != null && (
-                    <div className="mt-3 text-[11px] text-muted-foreground">Confidence {(m.confidence * 100).toFixed(0)}% · 6 sources</div>
-                  )}
-                </div>
+      {/* Messages */}
+      <div className="flex-1 overflow-y-auto space-y-4 pr-1 mb-4">
+        {messages.map((m, i) => (
+          <div key={i} className={cn("flex gap-3", m.role === "user" ? "justify-end" : "justify-start")}>
+            {m.role === "assistant" && (
+              <div className="h-7 w-7 rounded-full bg-[#B8924A]/20 border border-[#B8924A]/30 flex items-center justify-center shrink-0 mt-0.5">
+                <Sparkles className="h-3.5 w-3.5 text-[#B8924A]" />
               </div>
-            ))}
+            )}
+            <div className={cn(
+              "max-w-[80%] rounded-xl px-4 py-3 text-sm leading-relaxed",
+              m.role === "user"
+                ? "bg-white/[0.06] border border-white/[0.08] text-[#F2F0EB]"
+                : "bg-white/[0.02] border border-white/[0.06] text-[#F2F0EB]/90"
+            )}>
+              <div className="whitespace-pre-line">{m.content}</div>
+              {m.chart && (
+                <div className="mt-4 h-36">
+                  <div className="text-[10px] uppercase tracking-[0.18em] text-[#B0B0B0] mb-2">{m.chart.label}</div>
+                  <ResponsiveContainer>
+                    <BarChart data={m.chart.data} margin={{ top: 0, right: 4, left: -20, bottom: 0 }}>
+                      <CartesianGrid stroke="rgba(255,255,255,0.04)" vertical={false} />
+                      <XAxis dataKey="k" stroke="#B0B0B0" fontSize={10} axisLine={false} tickLine={false} />
+                      <YAxis hide />
+                      <Tooltip
+                        contentStyle={{ background: "#1C1C1C", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 8, fontSize: 11 }}
+                      />
+                      <Bar dataKey="v" fill={GOLD} radius={[4, 4, 0, 0]} />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+              {m.actions && (
+                <div className="mt-3 flex flex-wrap gap-2">
+                  {m.actions.map((a) => (
+                    <button
+                      key={a}
+                      className="inline-flex items-center gap-1 rounded-md border border-[#B8924A]/30 bg-[#B8924A]/[0.07] px-2.5 py-1 text-[11px] text-[#B8924A] hover:bg-[#B8924A]/[0.12] transition-all"
+                    >
+                      {a} <ChevronRight className="h-3 w-3" />
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+            {m.role === "user" && (
+              <div className="h-7 w-7 rounded-full bg-white/[0.06] border border-white/[0.1] flex items-center justify-center shrink-0 mt-0.5">
+                <span className="text-[10px] font-semibold text-[#B0B0B0]">U</span>
+              </div>
+            )}
           </div>
+        ))}
+        {loading && (
+          <div className="flex gap-3 justify-start">
+            <div className="h-7 w-7 rounded-full bg-[#B8924A]/20 border border-[#B8924A]/30 flex items-center justify-center shrink-0">
+              <Sparkles className="h-3.5 w-3.5 text-[#B8924A]" />
+            </div>
+            <div className="rounded-xl px-4 py-3 bg-white/[0.02] border border-white/[0.06]">
+              <div className="flex gap-1.5 items-center h-5">
+                {[0, 1, 2].map((i) => (
+                  <span
+                    key={i}
+                    className="h-1.5 w-1.5 rounded-full bg-[#B8924A]/60 animate-bounce"
+                    style={{ animationDelay: `${i * 150}ms` }}
+                  />
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+        <div ref={bottomRef} />
+      </div>
 
-          <form
-            onSubmit={(e) => { e.preventDefault(); send(input); }}
-            className="border-t border-border p-3 flex items-center gap-2"
-          >
-            <input
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              placeholder="Ask anything about your operation…"
-              className="flex-1 bg-background/40 border border-border rounded-md px-3 py-2.5 text-sm placeholder:text-muted-foreground/70 focus:outline-none focus:border-gold/50 transition"
-            />
-            <button type="submit" className="inline-flex items-center gap-2 rounded-md bg-primary text-primary-foreground px-3.5 py-2.5 text-sm font-medium shadow-glow-gold hover:opacity-95 transition">
-              <Send className="h-4 w-4" /> Send
+      {/* Suggestions */}
+      {messages.length <= 1 && (
+        <div className="mb-3 flex flex-wrap gap-2 shrink-0">
+          {suggestions.map((s) => (
+            <button
+              key={s}
+              onClick={() => send(s)}
+              className="rounded-lg border border-white/[0.07] bg-white/[0.02] px-3 py-2 text-xs text-[#B0B0B0] hover:border-[#B8924A]/30 hover:text-[#F2F0EB] hover:bg-[#B8924A]/[0.04] transition-all text-left"
+            >
+              {s}
             </button>
-          </form>
-        </section>
+          ))}
+        </div>
+      )}
+
+      {/* Input */}
+      <div className="shrink-0 flex gap-2">
+        <input
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && !e.shiftKey && send()}
+          placeholder="Ask about demand, anomalies, inventory, cohorts…"
+          className="flex-1 rounded-xl border border-white/[0.07] bg-white/[0.03] px-4 py-3 text-sm text-[#F2F0EB] placeholder:text-white/25 focus:outline-none focus:border-[#B8924A]/40 focus:bg-white/[0.05] transition-all"
+        />
+        <button
+          onClick={() => send()}
+          disabled={!input.trim() || loading}
+          className="rounded-xl bg-[#B8924A] text-[#0A0A0A] px-4 py-3 hover:bg-[#D4A96A] transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-glow-gold-sm"
+        >
+          <Send className="h-4 w-4" />
+        </button>
+      </div>
+      <div className="mt-2 text-center text-[10px] text-white/20">
+        Nexora Copilot · model nexora-ops-1 · confidence 0.91 avg
       </div>
     </div>
   );

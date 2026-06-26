@@ -12,19 +12,19 @@ import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0A] px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-7xl font-bold text-foreground">404</h1>
-        <h2 className="mt-4 text-xl font-semibold text-foreground">Page not found</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-[#B8924A] mb-4">404</div>
+        <h1 className="text-5xl font-semibold text-[#F2F0EB] tracking-[-0.02em]">Page not found</h1>
+        <p className="mt-4 text-sm text-[#B0B0B0] leading-relaxed">
           The page you're looking for doesn't exist or has been moved.
         </p>
-        <div className="mt-6">
+        <div className="mt-8">
           <Link
             to="/"
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            className="inline-flex items-center gap-2 rounded-md bg-[#B8924A] text-[#0A0A0A] px-5 py-2.5 text-sm font-semibold hover:bg-[#D4A96A] transition-colors"
           >
-            Go home
+            Return home
           </Link>
         </div>
       </div>
@@ -37,27 +37,25 @@ function ErrorComponent({ error, reset }: { error: Error; reset: () => void }) {
   const router = useRouter();
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background px-4">
+    <div className="flex min-h-screen items-center justify-center bg-[#0A0A0A] px-4">
       <div className="max-w-md text-center">
-        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+        <div className="text-[10px] uppercase tracking-[0.22em] text-red-400 mb-4">Error</div>
+        <h1 className="text-xl font-semibold text-[#F2F0EB] tracking-tight">
           This page didn't load
         </h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+        <p className="mt-3 text-sm text-[#B0B0B0] leading-relaxed">
           Something went wrong on our end. You can try refreshing or head back home.
         </p>
         <div className="mt-6 flex flex-wrap justify-center gap-2">
           <button
-            onClick={() => {
-              router.invalidate();
-              reset();
-            }}
-            className="inline-flex items-center justify-center rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+            onClick={() => { router.invalidate(); reset(); }}
+            className="inline-flex items-center rounded-md bg-[#B8924A] text-[#0A0A0A] px-4 py-2 text-sm font-semibold hover:bg-[#D4A96A] transition-colors"
           >
             Try again
           </button>
           <a
             href="/"
-            className="inline-flex items-center justify-center rounded-md border border-input bg-background px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-accent"
+            className="inline-flex items-center rounded-md border border-white/[0.1] text-[#F2F0EB] px-4 py-2 text-sm hover:border-[#B8924A]/40 transition-all"
           >
             Go home
           </a>
@@ -72,24 +70,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Nexora: The Operations Co-Pilot is an AI-powered SaaS platform for intelligent business operations." },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Nexora: The Operations Co-Pilot is an AI-powered SaaS platform for intelligent business operations." },
+      { title: "Nexora AI · Logistics Intelligence by MATRIX" },
+      { name: "description", content: "Nexora AI is the decision intelligence platform for retail, FMCG and distribution teams. Demand forecasting, anomaly detection, optimization, and AI copilot — cohered by design." },
+      { name: "author", content: "MATRIX · Intelligence. Architecture. Impact." },
+      { name: "theme-color", content: "#0A0A0A" },
+      { property: "og:title", content: "Nexora AI · Logistics Intelligence by MATRIX" },
+      { property: "og:description", content: "Demand forecasting, anomaly detection, optimization, and AI copilot for operations teams. Cohered by Design." },
       { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
-      { name: "twitter:title", content: "Lovable App" },
-      { name: "twitter:description", content: "Nexora: The Operations Co-Pilot is an AI-powered SaaS platform for intelligent business operations." },
-      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/52810901-0df1-4444-84b4-f3caa4ad708d/id-preview-61defa30--3172f637-7466-4f03-a868-46b2adebdad1.lovable.app-1779204301019.png" },
-      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/52810901-0df1-4444-84b4-f3caa4ad708d/id-preview-61defa30--3172f637-7466-4f03-a868-46b2adebdad1.lovable.app-1779204301019.png" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:site", content: "@matrixsystems" },
+      { name: "twitter:title", content: "Nexora AI · Logistics Intelligence by MATRIX" },
+      { name: "twitter:description", content: "Demand forecasting, anomaly detection, optimization, and AI copilot for operations teams." },
     ],
     links: [
-      {
-        rel: "stylesheet",
-        href: appCss,
-      },
+      { rel: "stylesheet", href: appCss },
+      { rel: "icon", type: "image/png", href: "/favicon.png" },
+      { rel: "apple-touch-icon", href: "/favicon.png" },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,300;0,14..32,400;0,14..32,500;0,14..32,600;0,14..32,700&display=swap" },
     ],
   }),
   shellComponent: RootShell,
@@ -100,11 +99,11 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
 
 function RootShell({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" className="dark">
       <head>
         <HeadContent />
       </head>
-      <body>
+      <body className="bg-[#0A0A0A] antialiased">
         {children}
         <Scripts />
       </body>
